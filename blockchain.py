@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 
 class Blockchain():
@@ -8,11 +9,26 @@ class Blockchain():
         # ジェネシスブロックを追加
         self.add(self.get_genesis_block())
 
-    def add(self, block):
+    def add(self, block=None, data=None):
+        # blockとdataの両方がNoneならば何もしない
+        if not (block or data):
+            print("error: add with no args")
+            return
+
+        # blockが指定されていない場合
+        if not block:
+            index = self.latest_index + 1
+            previous_hash = self.blocks[-1].hash  # 最後尾のブロックのhashを取得
+            timestamp = datetime.datetime.now()
+            hash = Block.calc_hash_from_args(index, previous_hash, timestamp, data)
+            block = Block(index, previous_hash, timestamp, data, hash)
+
         # blockが有効ならばblocksに追加
         if len(self.blocks) == 0 or block.is_valid(self.blocks[-1]):
             self.blocks.append(block)
             self.latest_index += 1
+        return
+
 
     def get_genesis_block(self):
         return Block(
@@ -39,10 +55,13 @@ class Block():
 
     def is_valid(self, pre_block):
         if pre_block.index + 1 != self.index:
+            print("error: invalid index")
             return False
         if pre_block.hash != self.previous_hash:
+            print("error: invalid previous_hash")
             return False
         if self.calc_hash() != self.hash:
+            print("error: invalid hash")
             return False
         return True
 
@@ -50,3 +69,9 @@ class Block():
         return hashlib.sha256(
             (str(self.index)+self.previous_hash+str(self.timestamp)+str(self.data)
         ).encode('utf-8')).hexdigest()
+
+    @classmethod
+    def calc_hash_from_args(cls, index, previous_hash, timestamp, data):
+        return hashlib.sha256(
+            (str(index)+previous_hash+str(timestamp)+str(data)).encode('utf-8')
+        ).hexdigest()
