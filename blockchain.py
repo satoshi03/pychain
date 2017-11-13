@@ -39,10 +39,6 @@ class Blockchain():
             "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7"
         )
 
-    @classmethod
-    def add_blockchain_count(cls):
-        cls.block_chain_count+=1
-
 
 class Block():
 
@@ -66,12 +62,10 @@ class Block():
         return True
 
     def calc_hash(self):
-        return hashlib.sha256(
-            (str(self.index)+self.previous_hash+str(self.timestamp)+str(self.data)
-        ).encode('utf-8')).hexdigest()
+        return Block.calc_hash_from_args(self.index, self.previous_hash, self.timestamp, self.data)
 
-    @classmethod
-    def calc_hash_from_args(cls, index, previous_hash, timestamp, data):
+    @staticmethod
+    def calc_hash_from_args(index, previous_hash, timestamp, data):
         return hashlib.sha256(
             (str(index)+previous_hash+str(timestamp)+str(data)).encode('utf-8')
         ).hexdigest()
