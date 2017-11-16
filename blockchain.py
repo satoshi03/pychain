@@ -9,6 +9,12 @@ class Blockchain():
         # ジェネシスブロックを追加
         self.add(self.get_genesis_block())
 
+    def __len__(self):
+        return len(self.blocks)
+
+    def __repr__(self):
+        return str(self.blocks)
+
     def add(self, block=None, data=None):
         # blockとdataの両方がNoneならば何もしない
         if not (block or data):
@@ -29,6 +35,13 @@ class Blockchain():
             self.latest_index += 1
         return
 
+    def replace(self, blockchain):
+        if blockchain.is_valid() and len(blockchain) > len(self):
+            self.blocks = blockchain
+            self.latest_index = blockchain[-1].index
+
+    def is_valid(self):
+        return True
 
     def get_genesis_block(self):
         return Block(
