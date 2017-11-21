@@ -37,10 +37,19 @@ class Blockchain():
 
     def replace(self, blockchain):
         if blockchain.is_valid() and len(blockchain) > len(self):
-            self.blocks = blockchain
-            self.latest_index = blockchain[-1].index
+            self.blocks = blockchain.blocks
+            self.latest_index = blockchain.blocks[-1].index
 
     def is_valid(self):
+        if str(self.blocks[0]) != str(self.get_genesis_block()):
+            print("invalid genesis block")
+            return False
+
+        for bl in self.blocks:
+            if bl.index != 0 and not bl.is_valid(self.blocks[bl.index-1]):
+                print("block invalid")
+                return False
+
         return True
 
     def get_genesis_block(self):
@@ -61,6 +70,9 @@ class Block():
         self.timestamp = timestamp
         self.data = data
         self.hash = hash
+
+    def __repr__(self):
+        return str(self.index)+self.previous_hash+str(self.timestamp)+self.data+self.hash
 
     def is_valid(self, pre_block):
         if pre_block.index + 1 != self.index:
