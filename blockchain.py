@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import json
 
 
 class Blockchain():
@@ -62,6 +63,9 @@ class Blockchain():
             "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7"
         )
 
+    def to_json(self):
+        return json.dumps([b.to_dict() for b in self.blocks])
+
 
 class Block():
 
@@ -89,6 +93,18 @@ class Block():
 
     def calc_hash(self):
         return Block.calc_hash_from_args(self.index, self.previous_hash, self.timestamp, self.data)
+
+    def to_dict(self):
+        return {
+            "index": self.index,
+            "previous_hash": self.previous_hash,
+            "timestamp": str(self.timestamp),
+            "data": str(self.data),
+            "hash": self.hash
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
 
     @staticmethod
     def calc_hash_from_args(index, previous_hash, timestamp, data):
