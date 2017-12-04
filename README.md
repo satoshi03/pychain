@@ -25,16 +25,36 @@ Run server on 8080 port as default
 python main.py
 ```
 
-Get blocks via curl command
+## Do process for blocks or peers via curl commands
+
+#### Get blocks
 
 ```
 curl  http://localhost:8080/blocks
 ```
 
-Add block via curl command
+##### Add block
 
 ```
 curl --data '{"data" : "Some data to the first block"}' http://localhost:8080/mineBlock
+```
+
+##### Get blocks
+
+```
+curl http://localhost:8080/blocks
+```
+
+##### Add peer
+
+```
+curl --data '{"peer" : "ws://localhost:6001"}' http://localhost:8080/mineBlock
+```
+
+#### Get peers
+
+```
+curl http://localhost:8080/peers
 ```
 
 # Test
