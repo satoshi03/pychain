@@ -45,8 +45,8 @@ class Peer():
     def to_dict(self):
         return {
             "ip": self.ip,
-            "port": self.port,
+            "port": self.port
         }
 
     def send(self, data):
-        self.socket.send(str.encode(json.dumps(data)))
+        self.socket.send(json.dumps(data).encode('utf-8'))

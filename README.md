@@ -1,25 +1,29 @@
 # pychain
-
-Pychain is an implementation of Naivechain in Python3 
+Pychain is an implementation of NaiveChain in Python3
 
 # Getting Started
 
 Download pytest on your local directory.
-
 ```
 git clone https://github.com/satoshi03/pychain.git
 ```
 
 Install dependencies.
-
 ```
 cd <project dir>
 pip install -r requirements.txt
 ```
 
-# How to run pychain server in development environment
+# Test
 
-Run server on 8080 port as default
+Test pychain code on your enviroment
+```
+pytest -v --flake8 --pep8
+```
+
+# How to run pychain server in development enviroment
+
+Run server on 8000 port as default
 
 ```
 python main.py
@@ -28,43 +32,25 @@ python main.py
 ## Do process for blocks or peers via curl commands
 
 #### Get blocks
-
 ```
-curl  http://localhost:8080/blocks
-```
-
-##### Add block
-
-```
-curl --data '{"data" : "Some data to the first block"}' http://localhost:8080/mineBlock
+curl http://localhost:8000/blocks
 ```
 
-##### Get blocks
-
+#### Add blocks
 ```
-curl http://localhost:8080/blocks
-```
-
-##### Add peer
-
-```
-curl --data '{"peer" : "ws://localhost:6001"}' http://localhost:8080/mineBlock
+curl --data '{"data" : "Some data to the first block"}' http://localhost:8000/mineBlock
 ```
 
 #### Get peers
-
 ```
-curl http://localhost:8080/peers
+curl http://localhost:8000/peers
 ```
 
-# Test
-
-Test pychain code on your environment.
-
+#### Add peer
 ```
-pytest -v --flake8 --pep8
+curl --data '{"peer" : "ws://localhost:8000"}' http://localhost:8000/addPeer
 ```
 
 # License
 
-MIT License
+MIT license

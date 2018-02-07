@@ -1,58 +1,45 @@
-import datetime
 import hashlib
+import datetime
 import json
 
 
 class Blockchain():
 
-    def __init__(self):
-        self.blocks = []
-        self.latest_index = -1
+    def __init__(self, blocks=None):
         # ジェネシスブロックを追加
-        self.add(self.get_genesis_block())
+        if blocks:
+            self.blocks = blocks
+            self.latest_index = len(blocks) - 1
+        else:
+            self.blocks = []
+            self.latest_index = -1
+            self.add(self.get_genesis_block())
 
     def __len__(self):
         return len(self.blocks)
 
-    def __repr__(self):
-        return str(self.blocks)
+    def get_latest_block(self):
+        return self.blocks[-1]
 
     def add(self, block=None, data=None):
-        # blockとdataの両方がNoneならば何もしない
+
+        # blockとdataの両方が指定されていない場合
         if not (block or data):
-            print("error: add with no args")
             return
 
-        # blockが指定されていない場合
+        # dataが指定されている場合
         if not block:
             index = self.latest_index + 1
-            previous_hash = self.blocks[-1].hash  # 最後尾のブロックのhashを取得
-            timestamp = datetime.datetime.now()
+            previous_hash = self.blocks[-1].hash
+            timestamp = int(datetime.datetime.timestamp(datetime.datetime.now()))
             hash = Block.calc_hash_from_args(index, previous_hash, timestamp, data)
             block = Block(index, previous_hash, timestamp, data, hash)
 
         # blockが有効ならばblocksに追加
-        if len(self.blocks) == 0 or block.is_valid(self.blocks[-1]):
+        if len(self) == 0 or block.is_valid(self.blocks[-1]):
             self.blocks.append(block)
             self.latest_index += 1
         return
-
-    def replace(self, blockchain):
-        if blockchain.is_valid() and len(blockchain) > len(self):
-            self.blocks = blockchain.blocks
-            self.latest_index = blockchain.blocks[-1].index
-
-    def is_valid(self):
-        if str(self.blocks[0]) != str(self.get_genesis_block()):
-            print("invalid genesis block")
-            return False
-
-        for bl in self.blocks:
-            if bl.index != 0 and not bl.is_valid(self.blocks[bl.index-1]):
-                print("block invalid")
-                return False
-
-        return True
 
     def get_genesis_block(self):
         return Block(
@@ -63,8 +50,25 @@ class Blockchain():
             "816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7"
         )
 
+    def is_valid(self):
+        if str(self.blocks[0]) != str(self.get_genesis_block()):
+            return False
+        for bl in self.blocks:
+            if bl.index != 0 and not bl.is_valid(self.blocks[bl.index-1]):
+                return False
+        return True
+
+    def replace(self, blocks):
+        blockchain = Blockchain(blocks=blocks)
+        if blockchain.is_valid() and len(blockchain) > len(self):
+            self.blocks = blockchain.blocks
+            self.latest_index = blockchain.blocks[-1].index
+
     def to_json(self):
-        return json.dumps([b.to_dict() for b in self.blocks])
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        return [b.to_dict() for b in self.blocks]
 
 
 class Block():
@@ -77,17 +81,17 @@ class Block():
         self.hash = hash
 
     def __repr__(self):
-        return str(self.index)+self.previous_hash+str(self.timestamp)+self.data+self.hash
+        return str(self.index) + self.previous_hash + str(self.timestamp) + self.data+self.hash
 
     def is_valid(self, pre_block):
         if pre_block.index + 1 != self.index:
-            print("error: invalid index")
+            print("index")
             return False
         if pre_block.hash != self.previous_hash:
-            print("error: invalid previous_hash")
+            print("previous_hash")
             return False
         if self.calc_hash() != self.hash:
-            print("error: invalid hash")
+            print("calc_hash")
             return False
         return True
 
@@ -95,19 +99,31 @@ class Block():
         return Block.calc_hash_from_args(self.index, self.previous_hash, self.timestamp, self.data)
 
     def to_dict(self):
-        return {
+        return ({
             "index": self.index,
             "previous_hash": self.previous_hash,
             "timestamp": str(self.timestamp),
             "data": str(self.data),
             "hash": self.hash
-        }
+        })
+
+    @classmethod
+    def make_from_dict(cls, dic):
+        return cls(
+            dic["index"],
+            dic["previous_hash"],
+            dic["timestamp"],
+            dic["data"],
+            dic["hash"]
+        )
 
     def to_json(self):
         return json.dumps(self.to_dict())
 
-    @staticmethod
-    def calc_hash_from_args(index, previous_hash, timestamp, data):
+    @classmethod
+    def calc_hash_from_args(cls, index, previous_hash, timestamp, data):
         return hashlib.sha256(
-            (str(index)+previous_hash+str(timestamp)+str(data)).encode('utf-8')
+            (
+                str(index) + previous_hash + str(timestamp) + str(data)
+            ).encode('utf-8')
         ).hexdigest()
