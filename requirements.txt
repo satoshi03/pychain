@@ -28,11 +28,11 @@ pytest==3.2.5
 pytest-cache==1.0
 pytest-flake8==0.9.1
 pytest-pep8==1.0.6
-requests==2.18.4
+requests>=2.20.0
 simplegeneric==0.8.1
 six==1.11.0
 tornado==4.5.3
 traitlets==4.3.2
-urllib3==1.22
+urllib3>=1.24.2
 wcwidth==0.1.7
 websocket-client==0.46.0
